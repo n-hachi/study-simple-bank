@@ -1,4 +1,1 @@
-db/sqlc/*.sql.go
-db/sqlc/models.go
-db/sqlc/db.go
 coverage/*
