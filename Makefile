@@ -28,4 +28,7 @@ test-cover:
 	rm *.coverprofile
 	go tool cover -html=coverage/cover.out -o=coverage/cover.html
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test test-cover
+server:
+	go run main.go
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test test-cover server
