@@ -28,10 +28,10 @@ test-cover:
 	rm *.coverprofile
 	go tool cover -html=coverage/cover.out -o=coverage/cover.html
 
-psql:
-	docker exec -it postgres12 psql -U root -d simple_bank
-
 server:
 	go run main.go
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test test-cover server
+psql:
+	docker exec -it postgres12 psql -U root -d simple_bank
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test test-cover server psql
