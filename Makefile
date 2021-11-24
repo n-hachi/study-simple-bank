@@ -34,4 +34,7 @@ server:
 psql:
 	docker exec -it postgres12 psql -U root -d simple_bank
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test test-cover server psql
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/n-hachi/study-simple-bank/db/sqlc Store
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test test-cover server psql mock
