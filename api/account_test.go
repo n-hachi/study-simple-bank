@@ -130,6 +130,10 @@ func TestCreateAccountAPI(t *testing.T) {
 					Times(1).
 					Return(account, nil)
 			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchAccount(t, recorder.Body, account)
+			},
 		},
 	}
 
@@ -157,14 +161,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			url := "/accounts"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 			server.router.ServeHTTP(recorder, request)
-			require.Equal(t, http.StatusOK, recorder.Code)
-			receiveData, err := ioutil.ReadAll(recorder.Body)
-			require.NoError(t, err)
-
-			var gotAccount db.Account
-			err = json.Unmarshal(receiveData, &gotAccount)
-			require.NoError(t, err)
-			require.Equal(t, account, gotAccount)
+			tc.checkResponse(t, recorder)
 		})
 	}
 }
