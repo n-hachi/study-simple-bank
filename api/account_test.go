@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/n-hachi/study-simple-bank/db/mock"
 	db "github.com/n-hachi/study-simple-bank/db/sqlc"
@@ -102,6 +103,48 @@ func TestGetAccountAPI(t *testing.T) {
 			tc.checkResponse(t, recorder)
 		})
 	}
+}
+
+func TestCreateAccountAPI(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	account := randomAccount()
+	arg := db.CreateAccountParams{
+		Owner:    account.Owner,
+		Currency: account.Currency,
+		Balance:  0,
+	}
+
+	store := mockdb.NewMockStore(ctrl)
+	store.EXPECT().
+		CreateAccount(gomock.Any(), gomock.Eq(arg)).
+		Times(1).
+		Return(account, nil)
+
+	server := NewServer(store)
+	recorder := httptest.NewRecorder()
+
+	//// Marshal body data to JSON
+	requestBody := gin.H{
+		"currency": account.Currency,
+		"owner":    account.Owner,
+	}
+	data, err := json.Marshal(requestBody)
+	require.NoError(t, err)
+
+	url := "/accounts"
+	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
+
+	server.router.ServeHTTP(recorder, request)
+	require.Equal(t, http.StatusOK, recorder.Code)
+	receiveData, err := ioutil.ReadAll(recorder.Body)
+	require.NoError(t, err)
+
+	var gotAccount db.Account
+	err = json.Unmarshal(receiveData, &gotAccount)
+	require.NoError(t, err)
+	require.Equal(t, account, gotAccount)
 }
 
 func randomAccount() db.Account {
