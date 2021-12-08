@@ -117,6 +117,7 @@ func TestCreateAccountAPI(t *testing.T) {
 		name          string
 		owner         string
 		currency      string
+		body          gin.H
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
@@ -124,6 +125,10 @@ func TestCreateAccountAPI(t *testing.T) {
 			name:     "OK",
 			owner:    account.Owner,
 			currency: account.Currency,
+			body: gin.H{
+				"currency": account.Currency,
+				"owner":    account.Owner,
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateAccount(gomock.Any(), gomock.Eq(arg)).
@@ -139,6 +144,10 @@ func TestCreateAccountAPI(t *testing.T) {
 			name:     "InternalError",
 			owner:    account.Owner,
 			currency: account.Currency,
+			body: gin.H{
+				"currency": account.Currency,
+				"owner":    account.Owner,
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateAccount(gomock.Any(), gomock.Eq(arg)).
@@ -165,11 +174,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			recorder := httptest.NewRecorder()
 
 			//// Marshal body data to JSON
-			requestBody := gin.H{
-				"currency": tc.currency,
-				"owner":    tc.owner,
-			}
-			data, err := json.Marshal(requestBody)
+			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
 			url := "/accounts"
