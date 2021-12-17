@@ -107,11 +107,6 @@ func TestGetAccountAPI(t *testing.T) {
 
 func TestCreateAccountAPI(t *testing.T) {
 	account := randomAccount()
-	arg := db.CreateAccountParams{
-		Owner:    account.Owner,
-		Currency: account.Currency,
-		Balance:  0,
-	}
 
 	testCases := []struct {
 		name          string
@@ -130,6 +125,11 @@ func TestCreateAccountAPI(t *testing.T) {
 				"owner":    account.Owner,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.CreateAccountParams{
+					Owner:    account.Owner,
+					Currency: account.Currency,
+					Balance:  0,
+				}
 				store.EXPECT().
 					CreateAccount(gomock.Any(), gomock.Eq(arg)).
 					Times(1).
@@ -150,7 +150,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-					CreateAccount(gomock.Any(), gomock.Eq(arg)).
+					CreateAccount(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(db.Account{}, sql.ErrConnDone)
 			},
@@ -163,7 +163,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			owner:    account.Owner,
 			currency: "ABC",
 			body: gin.H{
-				"currency": "ABC",
+				"currency": "invalid",
 				"owner":    account.Owner,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
