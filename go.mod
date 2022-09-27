@@ -3,6 +3,7 @@ module github.com/n-hachi/study-simple-bank
 go 1.16
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
